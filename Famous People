@@ -1,0 +1,78 @@
+/* Creating a table on artist information*/
+
+CREATE TABLE artists (
+    id INTEGER PRIMARY KEY,     
+    name TEXT, 
+    age INTEGER, 
+    hometown TEXT);
+
+INSERT INTO artists VALUES (1, "Jhene Aiko", 34, "Los Angeles, California");
+
+INSERT INTO artists VALUES (2, "Big Sean", 34, "Santa Monica, Califronia");
+
+INSERT INTO artists VALUES (3, "Rihanna", 34, "Bridgetown, Barbado"); 
+
+INSERT INTO artists VALUES (4, "A$AP Rocky", 34, "Manhattan, New York");
+
+INSERT INTO artists VALUES (5, "Beyonce", 41, "Houston, Texas");
+
+INSERT INTO artists VALUES (6, "Jay-Z", 52, "Brooklyn, New York");
+
+/*Creating table on relationships between artist*/
+
+CREATE TABLE couples (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,   couple1_id INTEGER, 
+    couple2_id INTEGER);
+
+INSERT INTO couples (couple1_id, couple2_id) VALUES (1, 2);
+
+INSERT INTO couples (couple1_id, couple2_id) VALUES (3,4);
+
+INSERT INTO couples (couple1_id, couple2_id) VALUES (5, 6);
+
+/* Creating table on song information*/
+
+CREATE TABLE songs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,   title TEXT,
+    artist_id INTEGER, 
+    release_year INTEGER);
+    
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Bed Peace", 1, 2014);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Triggered", 1, 2019); 
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Happiness Over Everything", 1, 2020);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("My Last", 2, 2011);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Bounce Back", 2, 2016);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Single Again", 2, 2019);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Pon de Replay", 3, 2005);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Rude Boy", 3, 2010);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Work", 3, 2016); 
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Goldie", 4, 2012);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Fasion Killa", 4, 2013);
+
+INSERT INTO songs (title, artist_id, release_year) VALUES ("Praise the Lord", 4, 2018);
+
+/*Joining 2 tables to display song title with their respective artists*/
+
+SELECT a.name AS artist, s.title
+FROM artists a
+JOIN songs s
+ON a.id = s.artist_id;
+
+/* Joining 2 tables to display the names of the couples*/
+
+SELECT a.name, b.name
+FROM couples
+JOIN artists a
+ON a.id = couples.couple1_id
+JOIN artists b
+ON b.id = couples.couple2_id;
