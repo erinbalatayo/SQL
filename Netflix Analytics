@@ -1,3 +1,5 @@
+#In this SQL code, I'm querying a database that's holding Nexflix data to answer questions about the data. 
+
 --Display 5 rows from the table 
 SELECT * FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info" LIMIT 5;
 
