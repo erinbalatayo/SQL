@@ -1,4 +1,5 @@
-#In this SQL code, I am creating 3 tables that hold information about famous artists, their relationships with one another, and details about their songs. All tables are related by id which allows me to join two tables at the bottome of this code.
+#In this SQL code, I am creating 3 tables that hold information about famous artists, their relationships with one another, and details about their songs. 
+#At the end of the code I will join two tables by their related attribute.
 
 /* Creating a table on artist information*/
 
