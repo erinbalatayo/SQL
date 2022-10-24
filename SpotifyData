@@ -1,0 +1,70 @@
+-- For this project, I used Kaggle to download Spotify data
+-- Then created a table to insert the data into
+-- Lastly, I performed analytics on the data using SQL by creating my own questions to answer
+
+--Creating the table:
+CREATE TABLE BIT_DB.Spotifydata (
+id integer PRIMARY KEY,
+artist_name varchar NOT NULL,
+track_name varchar NOT NULL,
+track_id varchar NOT NULL,
+popularity integer NOT NULL,
+danceability decimal(4,3) NOT NULL,
+energy decimal(4,3) NOT NULL,
+key integer NOT NULL,
+loudness decimal(5,3) NOT NULL,
+mode integer NOT NULL,
+speechiness decimal(5,4) NOT NULL,
+acousticness decimal(6,5) NOT NULL,
+instrumentalness text NOT NULL,
+liveness decimal(5,4) NOT NULL,
+valence decimal(4,3) NOT NULL,
+tempo decimal(6,3) NOT NULL,
+duration_ms integer NOT NULL,
+time_signature integer NOT NULL 
+)
+
+--After, I imported the Spotify Data .csv into the table 
+--Next, I explored the data using the following SQL code:
+SELECT * 
+FROM BIT_DB.spotifydata
+
+--First, I determined the avg popularity, danceability, and energy by artist and track
+SELECT artist_name, track_name, AVG(popularity), AVG(danceability), AVG(energy)
+FROM BIT_DB.spotifydata
+GROUP BY artist_name, track_name;
+
+-- Who are the top 10 artist by popularity?
+SELECT artist_name, popularity
+FROM BIT_DB.SpotifyData
+GROUP BY artist_name
+ORDER BY popularity desc
+LIMIT 10;
+
+-- What were the top 5 songs in 2021?
+SELECT track_name, artist_name, popularity
+FROM BIT_DB.spotifydata
+ORDER BY popularity desc
+LIMIT 5;
+
+-- Which artist have more than one track on the Top 50 list?
+SELECT count(artist_name) as songs, artist_name
+FROM BIT_DB.spotifydata
+GROUP BY artist_name
+HAVING songs >1
+ORDER BY songs desc;
+
+
+-- What was the average length of the top 50 songs? (Display in seconds)
+SELECT avg(duration_ms)/1000
+FROM BIT_DB.Spotifydata;
+
+-- What is the average key used in Doja Cat's tracks?
+SELECT avg(key)
+FROM BIT_DB.Spotifydata
+WHERE artist_name = 'Doja Cat'
+
+-- What is the least popular song by Olivia Rodrigo listed on the Top 50 list?
+SELECT min(popularity), track_name
+FROM BIT_DB.Spotifydata
+WHERE artist_name = 'Olivia Rodrigo'
