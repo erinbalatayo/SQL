@@ -1,0 +1,42 @@
+--To view how many villages are on the island
+SELECT *
+FROM village
+
+-- To view view a list of all inhabitants
+SELECT * 
+FROM inhabitant
+
+-- Find a butcher to ask for free sausages
+SELECT *
+FROM inhabitant
+WHERE job = 'butcher'
+
+-- Who are friendly inhabitants on the island?
+SELECT * 
+FROM inhabitant
+WHERE state = 'friendly'
+
+-- Find a friendly weaponsmith to get a sword from
+SELECT * 
+FROM inhabitant
+WHERE state = 'friendly' AND job = 'weaponsmith'
+
+-- Find a list of different people who can craft swords
+SELECT * 
+FROM inhabitant
+WHERE state = 'friendly' AND job like "%smith"
+
+-- What is your personid?
+SELECT personid
+FROM inhabitant
+WHERE name = 'Stranger'
+
+-- How much gold do you have?
+SELECT gold
+FROM inhabitant
+WHERE personid = 20
+
+-- Make a list of ownerless items you can sell to earn gold.
+SELECT *
+FROM item
+WHERE owner is NULL
