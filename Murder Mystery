@@ -1,0 +1,132 @@
+In this SQL code, I am using SQL to solve a murder that has taken place in SQL City on January 15th, 2018.
+Link: https://mystery.knightlab.com/
+
+Prompt:
+A crime has taken place and the detective needs your help. The detective gave you the crime scene report, but you somehow lost it. You vaguely remember that the crime was a ​murder​ that occurred sometime on ​Jan.15, 2018​ and that it took place in ​SQL City​. Start by retrieving the corresponding crime scene report from the police department’s database.
+
+-- Start by retrieving the corresponding crime scene report from the police department's database. 
+SELECT * 
+FROM crime_scene_report
+WHERE date = 20180115 AND city = 'SQL City' AND type = 'murder' 
+
+// output: 
+Date: 20180115
+Type: murder
+Description: Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr". The second witness, named Annabel, lives somewhere on "Franklin Ave".
+City: SQL City //
+
+-- Find witness reports.:
+WITH witness1 AS (
+  SELECT id 
+  FROM person 
+  WHERE address_street_name = 'Northwestern Dr'
+  ORDER BY address_number desc
+  LIMIT 1), 
+witness2 AS (
+  SELECT id
+  FROM person
+  WHERE INSTR(name,'Annabel') AND address_street_name = 'Franklin Ave' 
+), witnesses AS (
+  SELECT *, 1 AS witness
+  FROM witness1
+  UNION
+  SELECT *, 2 AS witness
+  FROM witness2
+)
+
+SELECT witness, transcript FROM witnesses
+LEFT JOIN interview
+ON witnesses.id = interview.person_id
+
+// Output: 
+Transcript from witness 1:
+	"I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. The membership number on the bag started with "48Z". Only gold members have those bags. The man got into a car with a plate that included "H42W"."
+Transcript from witness 2:
+  "I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th." //
+  
+  
+-- Now, I will crosscheck 4 different tables: get_fit_now_check_in, get_fit_now_member, person, and drivers_license
+WITH gym_checkins AS (
+  SELECT person_id, name
+  FROM get_fit_now_member mem
+  LEFT JOIN get_fit_now_check_in ci
+  ON mem.id=ci.membership_id
+  WHERE mem.membership_status = 'gold' 
+  AND ci.membership_id LIKE '48Z%'
+  AND ci.check_in_date = '20180109'
+), suspects AS (
+  SELECT gym_checkins.person_id, gym_checkins.name, plate_number, gender
+  FROM gym_checkins
+  LEFT JOIN person 
+  	ON gym_checkins.person_id=person.id
+  LEFT JOIN drivers_license
+  	ON person.license_id=drivers_license.id
+)
+SELECT *
+FROM suspects
+WHERE plate_number LIKE '%H42W%' AND gender = 'male'
+
+//Output:
+person_id: 67318
+name: Jeremy Bowers
+plate_number: 0H42W2
+gender: male //
+
+-- Checking my solution:
+INSERT INTO solution VALUES (1, 'Jeremy Bowers');
+        
+        SELECT value FROM solution;
+
+//Output: 
+Congrats, you found the murderer! But wait, there's more... If you think you're up for a challenge, try querying the interview transcript of the murderer to find the real villain behind this crime. If you feel especially confident in your SQL skills, try to complete this final step with no more than 2 queries. Use this same INSERT statement with your new suspect to check your answer.//
+
+-- Find the transcript from Jeremy Bower's interview:
+SELECT transcript
+FROM interview
+WHERE person_id = '67318'
+
+// Output:
+I was hired by a woman with a lot of money. I don't know her name but I know she's around 5'5" (65") or 5'7" (67"). She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.
+//
+
+
+-- Now, I will further investigate 4 tables: person, drivers_licsense, facebook_event_checkin, and income to discover the criminal behind the scenes 
+WITH red_tesla_drivers AS (
+  SELECT id
+  FROM drivers_license 
+  WHERE height >= 64 AND height <= 68
+  AND hair_color = 'red'
+  AND gender = 'female'
+  AND car_make = 'Tesla'
+  AND car_model = 'Model S'
+), murderer AS (
+  SELECT person.id AS person_id, annual_income, name
+  FROM red_tesla_drivers AS rtd
+  LEFT JOIN person ON rtd.id = person.license_id
+  LEFT JOIN income ON person.ssn=income.ssn
+), symphony_attendees AS (
+  SELECT person_id, COUNT(1) as n_checkins
+  FROM facebook_event_checkin 
+  WHERE event_name = 'SQL Symphony Concert'
+  GROUP BY person_id
+  HAVING n_checkins = 3
+)
+SELECT name, annual_income
+FROM murderer
+INNER JOIN symphony_attendees
+ON murderer.person_id=symphony_attendees.person_id
+
+//Output:
+Name: Miranda Priestly
+Annual_income: 310000 //
+
+--Checking my solution:
+INSERT INTO solution VALUES (1, 'Miranda Priestly');
+        
+        SELECT value FROM solution;
+        
+        
+//Output: 
+Congrats, you found the brains behind the murder! Everyone in SQL City hails you as the greatest SQL detective of all time. Time to break out the champagne!//
+
+Mystery solved! 
