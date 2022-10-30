@@ -1,3 +1,7 @@
+In this project, I used SQL to figure out how to escape from an island after a crash landing from an online free game called SQL island
+Link: https://sql-island.informatik.uni-kl.de/
+Certficate of completion: https://sql-island.informatik.uni-kl.de/cert.php?id=83ca7ff0ed
+
 --To view how many villages are on the island
 SELECT *
 FROM village
@@ -40,3 +44,84 @@ WHERE personid = 20
 SELECT *
 FROM item
 WHERE owner is NULL
+
+-- Collecgt all the ownerless items
+UPDATE item
+SET owner = 20 
+WHERE owner is NULL
+
+-- Display the list of items you own
+SELECT *
+FROM item
+WHERE owner = 20
+
+-- Find a friendly inhabitant who is either a dealer or a merchant. Maybe they want to buy some of my items.
+SELECT *
+FROM inhabitant
+WHERE state = 'friendly'
+AND JOB = 'dealer' OR job = 'merchant'
+
+-- "I'd like to get the ring and the teapot. The rest is nothing but scrap. Please give me the two items. My personid is 15."
+-- Update the items with the new owner id
+UPDATE item
+SET owner = 15
+WHERE (item = 'ring' OR item = 'teapot')
+
+--"Unfortunately, that's not enough gold to buy a sword. Seems like I do have to work after all. Maybe it's not a bad idea to change my name from Stranger to my real name before I will apply for a job."
+-- Update name to real name:
+UPDATE inhabitant
+SET name = 'Erin'
+WHERE personid = 20
+
+-- "Since baking is one of my hobbies, why not find a baker who I can work for?"
+SELECT *
+FROM inhabitant
+WHERE job = 'baker'
+ORDER BY gold desc
+
+-- "Is there a pilot on this island by any chance? He could fly me home."
+-- Find who the pilot is:
+SELECT *
+FROM inhabitant
+WHERE job = 'pilot'
+
+-- Find out the chief's name of village Onionville
+SELECT i.name
+FROM inhabitant i, village v
+WHERE v.chief == i.personid 
+AND v.name = 'Onionville'
+
+-- "Hello Erin, the pilot is held captive by Dirty Dieter in his sister's house. Shall I tell you how many women there are in Onionville? Nah, you can figure it out by yourself! (Hint: Women show up as gender = 'f')"
+-- How many women are there in Onionville?
+SELECT count(*)
+FROM inhabitant
+WHERE villageid = 3
+AND gender = 'f'
+
+-- "Oh, only one woman. What's her name?"
+SELECT name
+FROM inhabitant
+WHERE villageid = 3
+AND gender = 'f'
+
+-- "Oh no, baking bread alone can't solve my problems. If I continue working and selling items though, I could earn more gold than the worth of gold inventories of all bakers, dealers and merchants together. How much gold is that?"
+SELECT SUM(inhabitant.gold)
+FROM inhabitant
+WHERE job = 'baker' OR job = 'dealer' OR job = 'merchant'
+
+-- "Very interesting: For some reason, butchers own the most gold. How much gold do different inhabitants have on average, depending on their state (friendly, ...)?"
+SELECT state, AVG(gold)
+FROM inhabitant
+GROUP BY state
+ORDER BY AVG(gold)
+
+-- Heeeey! Now I'm very angry! What will you do next, Erin?
+-- Delete Dirty Diane:
+DELETE FROM inhabitant
+WHERE name = 'Dirty Diane'
+
+-- Release the pilot
+UPDATE inhabitant
+SET state = 'friendly'
+WHERE job = 'pilot'
+
