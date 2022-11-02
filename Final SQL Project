@@ -1,0 +1,113 @@
+-- In this SQL code, I'm querying a database that's holding digital media store data including tables regarding information on artists, albums, media tracks, invoices, and customers.
+
+-- 1. Show customer full names, customer ID, and country who do not reside in the US.
+SELECT customerid ,firstname, lastname, country
+FROM chinook.customers
+WHERE country <> 'USA';
+
+-- 2. Display customers who only reside in Brazil
+SELECT *
+FROM chinook.customers
+WHERE country = 'Brazil';
+
+-- 3. Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country.
+SELECT c.firstname, c.lastname, invoiceid, invoicedate, billingcountry
+FROM chinook.customers c
+LEFT JOIN chinook.invoices i
+ON c.customerid = i.customerid
+WHERE billingcountry = 'Brazil';
+
+-- 4. Show the Employees who are Sales Agents.
+SELECT *
+FROM chinook.employees
+WHERE title = 'Sales Support Agent';
+
+-- 5. Find a unique/distinct list of billing countries from the Invoice table.
+SELECT distinct billingcountry
+FROM chinook.invoices;
+
+-- 6. Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name.
+SELECT i.invoiceid, e.firstname, e.lastname
+FROM chinook.invoices i
+JOIN chinook.customers c 
+  ON i.customerid=c.customerid
+JOIN chinook.employees e 
+  ON c.supportrepid=e.employeeid;
+
+-- 7. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+SELECT i.invoiceid, i.total, c.firstname as customer_firstname, c.lastname as customer_lastname, c.country, e.firstname as employee_firstname, e.lastname as employee_lastname
+FROM chinook.invoices i
+JOIN chinook.customers c 
+    ON i.customerid=c.customerid
+JOIN chinook.employees e
+    ON c.supportrepid=e.employeeid; 
+
+-- 8. How many Invoices were there in 2009? 
+SELECT count(*)
+FROM chinook.invoices
+WHERE invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-12-31 00:00:00';
+
+-- 9. What are the total sales for 2009?
+SELECT SUM(total)
+FROM chinook.invoices
+WHERE invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-12-31 00:00:00';
+
+-- 10. Write a query that includes the purchased track name with each invoice line ID.
+SELECT t.name, i.invoicelineid
+FROM chinook.tracks t
+JOIN chinook.invoice_items i
+ON t.trackid=i.trackid;
+
+-- 11. Write a query that includes the purchased track name AND artist name with each invoice line ID.
+SELECT t.name AS track, art.name AS artist, i.invoicelineid
+FROM chinook.tracks t
+JOIN chinook.invoice_items i
+    ON t.trackid=i.trackid
+JOIN chinook.albums al
+    ON al.albumid=t.albumid
+JOIN chinook.artists art
+    ON art.artistid=al.artistid;
+    
+-- 12. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+SELECT t.name AS track, a.title AS album, m.name AS media_type, g.name AS genre
+FROM chinook.tracks t
+JOIN chinook.albums a 
+  ON a.albumid=t.albumid
+JOIN chinook.media_types m 
+  ON m.mediatypeid=t.mediatypeid
+JOIN chinook.genres g 
+  ON g.genreid=t.genreid;
+  
+-- 13. Show the total sales made by each sales agent.
+SELECT e.firstname, e.lastname, round(sum(i.total),2) as 'Total Sales'
+FROM chinook.invoices i
+JOIN chinook.customers c
+    on c.customerid=i.customerid
+JOIN chinook.employees e
+    on e.employeeid=c.supportrepid
+WHERE e.title = 'Sales Support Agent'
+GROUP BY e.firstname
+
+-- 14. Which sales agent made the most dollars in sales in 2009?
+SELECT e.firstname, e.lastname,round(sum(i.total),2) as 'Total Sales'
+FROM chinook.invoices i
+JOIN chinook.customers c
+    on i.customerid=c.customerid
+JOIN chinook.employees e
+    on e.employeeid=c.supportrepid
+WHERE e.title = 'Sales Support Agent' AND invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-12-31 00:00:00'
+GROUP BY e.firstname
+ORDER BY 'Total Sales' desc
+LIMIT 1;
+
+-- 15. Which sales agent made the least dollars in sales in 2009?
+SELECT e.firstname, e.lastname,round(sum(i.total),2) as 'Total Sales'
+FROM chinook.invoices i
+JOIN chinook.customers c
+    on i.customerid=c.customerid
+JOIN chinook.employees e
+    on e.employeeid=c.supportrepid
+WHERE e.title = 'Sales Support Agent' AND invoicedate BETWEEN '2009-01-01 00:00:00' AND '2009-12-31 00:00:00'
+GROUP BY e.firstname
+ORDER BY 'Total Sales' asc
+LIMIT 1;
