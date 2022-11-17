@@ -1,0 +1,59 @@
+-- In this SQL code, I explored the dataset and came up with a series of questions to answer
+-- Link: https://www.kaggle.com/datasets/shilparane/salaries
+
+--What are the top 10 paying jobs in San Francisco?
+SELECT distinct jobtitle, basepay, agency
+FROM salaries
+WHERE basepay >0 AND basepay !="" AND basepay != 'Not Provided'
+GROUP BY jobtitle
+ORDER BY basepay desc
+LIMIT 10;
+
+-- What are the 10 least paying jobs in SF?
+SELECT distinct jobtitle, basepay
+FROM salaries
+WHERE basepay >0
+GROUP BY jobtitle
+ORDER BY basepay ASC
+LIMIT 10;
+
+-- What are the top 5 paying jobs that do not offer overtime pay?
+SELECT distinct jobtitle, basepay, overtimepay
+FROM salaries
+WHERE overtimepay = 0 AND basepay !=""
+GROUP BY jobtitle
+ORDER BY basepay desc
+LIMIT 5;
+
+-- What are the 5 least paying jobs that do not offer overtime pay?
+SELECT distinct jobtitle, basepay, overtimepay
+FROM salaries
+WHERE overtimepay = 0 AND basepay >0
+GROUP BY jobtitle
+ORDER BY basepay asc
+LIMIT 5;
+
+-- Who are the most paid firefighters in SF in 2012
+SELECT employeename, jobtitle, totalpay, year
+FROM salaries
+WHERE jobtitle = 'Firefighter' AND year = 2012
+GROUP BY employeename
+ORDER BY totalpay desc
+LIMIT 3;
+
+-- How many firefighters were employeed in 2012
+SELECT count(*)
+FROM salaries
+WHERE jobtitle = 'Firefighter' AND year = 2012
+
+-- What is the average salary for Firefighters in 2012?
+SELECT jobtitle, ROUND(AVG(totalpay), 2) AS "Average Total Pay"
+FROM salaries
+WHERE jobtitle = 'Firefighter' AND year = 2012
+
+-- What is the salary for Captain roles?
+SELECT DISTINCT jobtitle, ROUND(AVG(basepay), 2) AS 'Avg Base Pay'
+FROM salaries 
+WHERE jobtitle LIKE '%CAPTAIN%' AND 'Avg base pay' <>0
+GROUP BY jobtitle
+ORDER BY 'Avg Base Pay' asc
