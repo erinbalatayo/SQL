@@ -1,5 +1,4 @@
 #In this SQL code, I am querying a database with multiple tables regarding customer information and monthly sales to answer the following statistical questions.
-
 --How many orders were placed in January? Remember to filter out the blank and incorrect order IDs like we did in the "dealing with messy data" section of the previous lesson!
 SELECT COUNT(*)
 FROM BIT_DB.JanSales
@@ -42,3 +41,23 @@ WHERE length(orderid) = 6
     AND orderID <> ' '
 GROUP BY product
 ORDER BY revenue desc;
+
+--Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
+SELECT product
+    , SUM(quantity)
+    , (quantity*price) AS revenue
+FROM BIT_DB.FebSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+GROUP BY product;
+
+ --How many customers ordered more than 2 products at a time in February, and what was the average amount spent for those customers?
+SELECT COUNT(acctnum) AS Customer_Quantity
+    , ROUND(AVG(price*quantity),2) AS Avg_Spent
+FROM BIT_DB.customers AS cust
+LEFT JOIN BIT_DB.FebSales AS Feb
+ON cust.order_id=feb.orderid
+WHERE quantity>2
+    AND length(orderid)=6
+    AND orderid IS NOT NULL 
+    AND orderid <> ' ';
+    
