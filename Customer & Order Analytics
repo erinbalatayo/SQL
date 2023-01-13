@@ -1,5 +1,7 @@
 #In this SQL code, I am querying a database with multiple tables regarding customer information and monthly sales to answer the following statistical questions.
 
+#In this SQL code, I am querying a database with multiple tables regarding customer information and monthly sales to answer the following statistical questions.
+
 -- Select all columns and 20 rows from the customers table
 SELECT * 
 FROM BIT_DB.customers
