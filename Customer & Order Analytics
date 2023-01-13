@@ -1,55 +1,43 @@
 #In this SQL code, I am querying a database with multiple tables regarding customer information and monthly sales to answer the following statistical questions.
-
-#In this SQL code, I am querying a database with multiple tables regarding customer information and monthly sales to answer the following statistical questions.
-
--- Select all columns and 20 rows from the customers table
-SELECT * 
-FROM BIT_DB.customers
-LIMIT 20;
-
--- Select all columns and 20 rows from the Jan sales table
-SELECT *
+--How many orders were placed in January? Remember to filter out the blank and incorrect order IDs like we did in the "dealing with messy data" section of the previous lesson!
+SELECT COUNT(*)
 FROM BIT_DB.JanSales
-LIMIT 20;
+WHERE length(orderID) = 6 
+    AND orderID IS NOT NULL 
+    AND orderID <> ' ';
+    
 
--- #1 How many orders were placed in January?
-SELECT count(*)
-FROM BIT_DB.JanSales;
-
--- #2 How many of those orders were for an iPhone?
-SELECT count(*)
+--How many of those orders were for an iPhone?
+SELECT COUNT(*)
 FROM BIT_DB.JanSales
-WHERE product = 'iPhone';
+WHERE length(orderID) = 6 
+    AND orderID IS NOT NULL 
+    AND orderID <> ' '
+    AND product = 'iPhone';
+    
+--Select the customer account numbers for all the orders that were placed in February.
+SELECT distinct acctnum
+FROM BIT_DB.customers AS cust
+INNER JOIN BIT_DB.FebSales AS Feb
+ON cust.order_id=feb.orderID
+WHERE length(orderid) = 6
+    AND orderid IS NOT NULL
+    AND orderID <> ' ';
 
--- #3 Select the customer account numbers for all the orders that were placed in February
-SELECT c.acctnum
-FROM BIT_DB.customers as C
-INNER JOIN BIT_DB.FebSales as Feb
-ON c.order_id = feb.orderID;
 
--- #4 Which product was the cheapest one sold in January, and what was the price?
+--Which product was the cheapest one sold in January, and what was the price?
 SELECT product, MIN(price)
-FROM BIT_DB.JanSales;
-
--- #5 What is the total revenue for each product sold in January? (Revenue can be calculated using the numberof products sold and the price of the products)
-SELECT (sum(quantity)*price) as revenue, product
 FROM BIT_DB.JanSales
-GROUP BY product;
+WHERE length(orderid) = 6
+    AND orderid IS NOT NULL
+    AND orderID <> ' ';
 
--- #6 Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
-SELECT product, sum(quantity), sum(quantity)*price as revenue
-FROM BIT_DB.FebSales
-WHERE location = '548 Lincoln St, Seattle, WA 98101';
-
--- #7 How many customers ordered more than 2 products at a time in February, and what was the average amount spent for those customers?
-SELECT count(c.acctnum), avg(price*quantity)
-FROM BIT_DB.FebSales Feb
-LEFT JOIN BIT_DB.customers C
-ON c.order_id=feb.orderID
-WHERE feb.quantity >2;
-
--- #8 List all the products sold in Los Angeles in February, and include how many of each were sold
-SELECT product, sum(quantity)
-FROM BIT_DB.FebSales
-WHERE location like '%Los Angeles%'
-GROUP BY product;
+--What is the total revenue for each product sold in January? (Revenue can be calculated using the number of products sold and the price of the products).
+SELECT product
+    , ROUND(SUM(quantity*price),2) AS revenue
+FROM BIT_DB.JanSales 
+WHERE length(orderid) = 6
+    AND orderID IS NOT NULL
+    AND orderID <> ' '
+GROUP BY product
+ORDER BY revenue desc;
