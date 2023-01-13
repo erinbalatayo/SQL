@@ -1,4 +1,5 @@
 #In this SQL code, I am querying a database with multiple tables regarding customer information and monthly sales to answer the following statistical questions.
+
 --How many orders were placed in January? Remember to filter out the blank and incorrect order IDs like we did in the "dealing with messy data" section of the previous lesson!
 SELECT COUNT(*)
 FROM BIT_DB.JanSales
