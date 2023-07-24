@@ -1,8 +1,8 @@
--- For this project, I used Kaggle to download Spotify data
--- Then created a table to insert the data into
--- Lastly, I performed analytics on the data using SQL by creating my own questions to answer
+# For this project, I downloaded Spotify date from Kaggle: 
+# Then I created a table to insert Spotify data into
+# Finally, I performed analytics on data using SQL.
 
---Creating the table:
+#Creating the table:
 CREATE TABLE BIT_DB.Spotifydata (
 id integer PRIMARY KEY,
 artist_name varchar NOT NULL,
@@ -11,60 +11,81 @@ track_id varchar NOT NULL,
 popularity integer NOT NULL,
 danceability decimal(4,3) NOT NULL,
 energy decimal(4,3) NOT NULL,
-key integer NOT NULL,
+song_key integer NOT NULL,
 loudness decimal(5,3) NOT NULL,
-mode integer NOT NULL,
+song_mode integer NOT NULL,
 speechiness decimal(5,4) NOT NULL,
 acousticness decimal(6,5) NOT NULL,
-instrumentalness text NOT NULL,
+instrumentalness decimal(8,7) NOT NULL,
 liveness decimal(5,4) NOT NULL,
 valence decimal(4,3) NOT NULL,
 tempo decimal(6,3) NOT NULL,
 duration_ms integer NOT NULL,
-time_signature integer NOT NULL 
-)
+time_signature integer NOT NULL )
 
---After, I imported the Spotify Data .csv into the table 
---Next, I explored the data using the following SQL code:
-SELECT * 
-FROM BIT_DB.spotifydata
+# Then I inserted the Spotify data .csv into the table 
+# Next, I explored the data using the following SQL.
 
---First, I determined the avg popularity, danceability, and energy by artist and track
-SELECT artist_name, track_name, AVG(popularity), AVG(danceability), AVG(energy)
-FROM BIT_DB.spotifydata
-GROUP BY artist_name, track_name;
+# First, I determined the avg popularity, danceability, and energy by artist and track
 
--- Who are the top 10 artist by popularity?
+SELECT artist_name, track_name,
+    avg(popularity), avg(danceability), avg(energy)
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name, track_name
+
+# Then, I deteremined the top 10 artists by popularity
+
 SELECT artist_name, popularity
-FROM BIT_DB.SpotifyData
-GROUP BY artist_name
-ORDER BY popularity desc
+FROM BIT_DB.spotifydata
+GROUP BY artist_name, popularity
+ORDER BY popularity DESC
 LIMIT 10;
 
--- What were the top 5 songs in 2021?
-SELECT track_name, artist_name, popularity
-FROM BIT_DB.spotifydata
-ORDER BY popularity desc
+#Then, I determined the top 5 songs by popularity
+
+SELECT track_name, popularity
+FROM BIT_DB.Spotifydata
+GROUP BY track_name
+ORDER BY popularity DESC
+LIMIT 5
+
+# I was curious if the duration of the song has an effect on the popularity of the song. However, as a result there is no correlection since the popular songs range between 2-3 minutes, with the longest song in the database being 4 minutes. 
+
+SELECT track_name, popularity, duration_ms/60000 AS 'duartion(min)'
+FROM BIT_DB.Spotifydata
+GROUP BY track_name
+ORDER BY 'duration(min)', popularity DESC
 LIMIT 5;
 
--- Which artist have more than one track on the Top 50 list?
-SELECT count(artist_name) as songs, artist_name
+# Next, I wanted to determine if danceability has an effect on the popularity of the song. As a result, there is no correlation between danceability and popularity of a song.
+
+SELECT track_name, popularity, danceability
+FROM BIT_DB.Spotifydata
+GROUP BY track_name
+ORDER BY danceability, popularity DESC
+LIMIT 10;
+
+# Then, I determined the artist who had the most songs featured in the Top 50 list in 2021. 
+
+SELECT artist_name, count(artist_name) AS 'num_featured'
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+ORDER BY count(artist_name) DESC;
+
+# As a result, Doja Cat and Olivia Rodrigo were tied with 4 featured songs. 
+# Then, I determined their top 4 songs by popularity
+
+SELECT artist_name, track_name, popularity
+FROM BIT_DB.Spotifydata
+WHERE artist_name IN ('Doja Cat', 'Olivia Rodrigo')
+GROUP BY artist_name ,track_name, popularity
+ORDER BY artist_name, popularity DESC;
+
+#Then, I determined which artist have at least more than one song featured in the Top 50 list.
+
+SELECT artist_name, count(artist_name) AS num_featured
 FROM BIT_DB.spotifydata
 GROUP BY artist_name
-HAVING songs >1
-ORDER BY songs desc;
+HAVING num_featured>1
+ORDER BY num_featured DESC;
 
-
--- What was the average length of the top 50 songs? (Display in seconds)
-SELECT avg(duration_ms)/1000
-FROM BIT_DB.Spotifydata;
-
--- What is the average key used in Doja Cat's tracks?
-SELECT avg(key)
-FROM BIT_DB.Spotifydata
-WHERE artist_name = 'Doja Cat'
-
--- What is the least popular song by Olivia Rodrigo listed on the Top 50 list?
-SELECT min(popularity), track_name
-FROM BIT_DB.Spotifydata
-WHERE artist_name = 'Olivia Rodrigo'
