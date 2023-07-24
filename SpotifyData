@@ -89,3 +89,10 @@ GROUP BY artist_name
 HAVING num_featured>1
 ORDER BY num_featured DESC;
 
+# I determined which artist released the longest and shortest song.
+
+SELECT artist_name, track_name, MAX(duration_ms)
+FROM BIT_DB.spotifydata
+
+SELECT artist_name, track_name, MIN(duration_ms)
+FROM BIT_DB.spotifydata
