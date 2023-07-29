@@ -102,3 +102,18 @@ SELECT street,
 FROM safety_average_CTE
 WHERE rating>=4.0
 GROUP BY street;
+
+#Next, I will provide a list of all bike lanes, both safety ratings for each lane, the average safety rating for each lane, and a label with the recommendation as "Remove", Leave As-Is", or "Needs Improvement"
+#Bike lanes with an avg >=4 should be "Leave As-Is"
+#Bike Lanes with an avg <2.5 should be "Remove"
+#All other bike lanes should be labeled as "Improvements Needed"
+
+SELECT street, safetyrating,
+    AVG(safetyrating) OVER (PARTITION BY street) AS "Average_Safety_Rating",
+    CASE
+        WHEN AVG(safetyrating) OVER (PARTITION BY street) >=4.0 THEN "Leave As-Is"
+        WHEN AVG(safetyrating) OVER (PARTITION BY street) <2.5 THEN "Remove"
+        ELSE "Improvements Needed"
+    END AS "Recommendations"
+FROM CityBikeLanes;
+
