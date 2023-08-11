@@ -1,0 +1,125 @@
+-- Here, I signed up for a SQL Bootcamp through Udemy to practice SQL syntax to master my skills.
+-- This bootcamp consists of a variety of questions and challenges 
+-- I used SQL to query from a large database through the RDBMS, PostgreSQL.
+
+-- 1. In this challenge, we want to send out promotional email to our existing customers.
+# Here, I knew that we needed to look at the customers table to find information of existing customers. 
+# From that table, I needed to query first and last names of the customers, in addition to an email to send our promos to. 
+# See the SQL syntax below.
+
+SELECT first_name, last_name, email
+FROM customers;
+
+-- 2. In this challenge, an Australian visitor isn’t familiar with MPAA movie ratings (e.g. PG, PG13, R). 
+# We want to know the types of ratings we have available in the database
+# After reviewing the database I noticed that there would be a lot of duplicate ratings. 
+# To avoid querying duplicate values, I used the DISTINCT function. See query below.
+
+SELECT DISTINCT rating
+FROM film;
+
+-- 3. A customer forgot their wallet at our store! We need to track down their email to inform them
+--- What is the email for the customer with the name Nancy Thomas?
+
+SELECT email
+FROM customer
+WHERE first_name='Nancy' AND last_name='Thomas';
+
+-- 4. A customer wasnt to know what the movie "Outlaw Hanky" is about. 
+ # This tells me that I need to query the database to provide the customer with the description of the movie. 
+
+SELECT description
+FROM film
+WHERE title='Outlaw Hanky';
+
+-- 5. A customer is late on their movie return and we've mailed them a letter to their address '259 Ipoh Drive'. We should call them on the phone to let them know.
+# I need to find the phone number of the customer who lives on 259 Ipoh Drive. 
+# I know that this would be found in the adresss table and I will need to use the WHERE function to filter out customer phone numbers who reside on  that address. 
+
+SELECT phone
+FROM address
+WHERE address='259 Ipoh Drive';
+
+-- 6. We want to reward our first 10 paying customers. What are the customer ids of the first 10 customers who created a payment?
+# First, I want to find the table which contains customer id and payment date - this would be the payment table
+# Then, I want to order the data by payment date in ascedning order and limit to syntax to only 10 rows.
+
+SELECT customer_id
+FROM payment
+ORDER BY payment_date ASC
+LIMIT 10;
+
+-- 7. A customer wants to quickly rent a video to watch over their short lunch break. 
+-- What are the titles of the 5 shortest (in lenght of runtime) movies?
+# First, I want to find the table that contains film information (table: film)
+# Then, I want to select the title names and length of each film 
+# I also want to order the data by lenght in ascending order (shortest to longest) and limit to only 5 rows
+
+SELECT title, length
+FROM film
+ORDER BY length ASC
+LIMIT 5;
+
+-- 8. If the previous customer can watch any movie that is under 50 minutes or less in run time, how many options does she have?
+# First, I need to find the table that contains film information (table: film)
+# Then filter out movies that are shorter than 50 minutes by using <=
+# Lastly, make sure to use the aggregate function "COUNT" to count each row that satisfies the filter (less than 50 minutes)
+
+SELECT COUNT(*)
+FROM film
+WHERE length <= 50;
+
+-- 9. How many payment transactions were greater than $5.00? 
+# First, I need to find the table that holds payment information (table: payment)
+# I want to filter the data by using the WHERE clause to choose amounts greater than $5.00
+# Lastly, I will use the count aggregate function to count the number of rows that satsify the filter of amounts over $5.00
+
+SELECT COUNT(amount)
+FROM payment
+WHERE amount>5.00;
+
+-- 10. How many actors have a first name that starts with the letter P?
+# First, I will locate the table that holds actor information (table: actor)
+# Then, use the WHERE clause to filter out first names that start with the letter P by using the LIKE % syntax
+# Lastly, use the COUNT aggregate function to count each row that satisfies those filters.
+
+SELECT COUNT(*)
+FROM actor
+WHERE first_name LIKE 'P%';
+
+-- 11. How many unique districts are our customers from?
+# First, I need to locate the table that contains address information such as districts (table: address)
+# Next, I wanto to select DISTINCT districts to avoid querying duplicate districts
+# Lastly, use the count aggregate function to count each row that satisfies the filter.
+
+SELECT COUNT(DISTINCT(district))
+FROM address;
+
+-- 12. Retrieve the list of names for those distinct districts from the previous question
+# I will just revise the first row by removing count from the select function
+
+SELECT DISTINCT district
+FROM address;
+
+-- 13. How many films have a rating of R and replacement cost between $5 and $15. 
+# First, I want to find the table that contains film information (table: film)
+# Next, I will use the WHERE clause to filter out replacement costs BETWEEN $5 and $15 and have a rating of R
+# Lastly, I will use the COUNT function to count each row that satisfies the filter.
+
+SELECT COUNT(*)
+FROM film
+WHERE rating ='R' AND replacement_cost BETWEEN 5 AND 15;
+
+
+-- 16. How many films have the word Truman somewhere in the title?
+# First, locate the table that contains film information (table: film)
+# Then, filter out titles that have Truman in the title with the LIKE % function
+# Lastly, use the COUNT agggregate function to count each row that satisfies the filter.
+
+SELECT COUNT(*)
+FROM film
+WHERE title LIKE '%Truman%';
+
+
+
+
