@@ -1,5 +1,5 @@
 -- Here, I signed up for a SQL Bootcamp through Udemy to practice SQL syntax to master my skills.
--- This bootcamp consists of a variety of questions and challenges 
+-- This bootcamp consists of a variety of questions and challenges. This reviews SQL fundamental statements,  including GROUP BY and HAVING
 -- I used SQL to query from a large database through the RDBMS, PostgreSQL.
 
 -- 1. In this challenge, we want to send out promotional email to our existing customers.
@@ -120,6 +120,75 @@ SELECT COUNT(*)
 FROM film
 WHERE title LIKE '%Truman%';
 
+-- 17. We have two staff members, with Staff IDs 1 and 2. We want to give a bonus to the staff member that handled the most payments (most in terms of number of total payments processed, not the total dollar amount).
+--  How many payments did each staff member handle and who gets the bonus?
+# First, locate the payment table that contains staff id and payment information.
+# Then, select staff ID and use the count aggregate function to query the number of payments processed
+# Lastly, group by the staff_id column and order by the number of payments in descending order. 
+
+SELECT staff_id, COUNT(payment_id)
+FROM payment
+GROUP BY staff_id 
+ORDER BY COUNT(payment_id) DESC;
+
+# As a result, staff with ID 2 will get the bonus. 
 
 
+-- 18. Corporate HQ is conducting a study on the relationship between replacement cost and a movie MPAA rating (eg. G, PG, R, etc.)
+-- What is the average replacement cost per MPAA rating? 
 
+SELECT rating, ROUND(AVG(replacement_cost),2)
+FROM film
+GROUP BY rating
+ORDER BY ROUND(AVG(replacement_cost),2); 
+
+ -- 20. We are running a promotion to reward our top 5 customers with coupons.
+-- What are the customer ids of the top 5 customers by total spend?
+
+SELECT customer_id, SUM(amount)
+FROM payment
+GROUP BY customer_id
+ORDER BY SUM(amount) DESC
+LIMIT 5;
+
+-- 21. We are launching a platinum service for our most loyal customers. We will assign platinum status to customers that have had 40 or more transaction payments. 
+-- What customer ids are eligible for platinum status? 
+
+SELECT customer_id, COUNT(*)
+FROM payment
+GROUP BY customer_id
+HAVING COUNT(*)>=40;
+
+-- 22. What are the customer ids of customers who have spent more than $100 in payment transactions with our staff_id member 2?
+
+SELECT customer_id, SUM(amount)
+FROM payment
+WHERE staff_id=2
+GROUP BY customer_id
+HAVING SUM(amount)>100;
+
+
+-- Assessment Test
+-- 1. Return the customer IDs of customer who have spent at least $110 with the staff member who has an ID of 2.
+
+SELECT customer_id, SUM(amount)
+FROM payment
+WHERE staff_id=2
+GROUP BY customer_id
+HAVING SUM(amount)>=110;
+
+-- 2. How many films begin with the letter J?
+
+SELECT COUNT(*)
+FROM film
+WHERE title LIKE 'J%';
+
+
+--3. What customer has the highest customer ID number whose name starts with an E and has an address ID lower than 500?
+
+SELECT first_name, last_name
+FROM customer
+WHERE first_name LIKE 'E%' AND address_id<500
+GROUP BY customer_id
+ORDER BY customer_id DESC
+LIMIT 1;
