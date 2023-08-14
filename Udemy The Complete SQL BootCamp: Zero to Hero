@@ -2,6 +2,8 @@
 -- This bootcamp consists of a variety of questions and challenges. This reviews SQL fundamental statements,  including GROUP BY and HAVING
 -- I used SQL to query from a large database through the RDBMS, PostgreSQL.
 
+# Section 1 - 4 
+
 -- 1. In this challenge, we want to send out promotional email to our existing customers.
 # Here, I knew that we needed to look at the customers table to find information of existing customers. 
 # From that table, I needed to query first and last names of the customers, in addition to an email to send our promos to. 
@@ -192,3 +194,8 @@ WHERE first_name LIKE 'E%' AND address_id<500
 GROUP BY customer_id
 ORDER BY customer_id DESC
 LIMIT 1;
+
+
+# Section 5 - 7
+
+
