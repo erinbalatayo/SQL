@@ -1,0 +1,45 @@
+# In this project, I used the Superstore Database provided from http://sqlfiddle.com/#!5/ce3dc3
+
+# Write your own SQL query that uses a SELECT statement to order the items by price.
+
+SELECT *
+FROM superstore
+ORDER BY price DESC;
+
+# Write your own SQL query that will show a statistic about the item prices, like a sum, average, minimum, maximum, or count.
+
+SELECT item_name, MAX(price)
+FROM superstore
+WHERE category='Electronics' AND average_rating <4.5;
+
+# Write your own SQL query that will show a statistic about the price for items in the category of "Kitchen Supplies". The values in the categories column are called text strings, and text strings are case sensitive. That means if you want to select "Kitchen Supplies", you will need to type it exactly as it appears in the data, ie with a capital "K" and a capital "S".
+
+SELECT AVG(price)
+FROM superstore
+where category='Kitchen Supplies';
+
+# Come up with your own question about the data and try to answer it using SQL. For example: How many air purifiers are in stock? It's okay if you can't figure out how to answer your question, the idea here is to practice thinking about what kinds of insights you can get from a dataset from asking questions about it.
+
+#How many robot vacuum cleaners are in stock?
+
+SELECT item_name, stock_quantity
+FROM superstore
+WHERE item_name='Robot Vacuum Cleaner';
+
+#How many Furnishing items are in stock and is less than $200?
+
+SELECT COUNT(*)
+FROM superstore
+WHERE category='Furnishings' AND price<200;
+
+#What is the highest rated appliance item and it's price?
+
+SELECT item_name, price, MAX(average_rating)
+FROM superstore;
+
+#Provide a list of electronic items that have a rating above 4.2. Order the list by price by descending order.
+
+SELECT *
+FROM superstore
+WHERE category='Electronics' AND average_rating>4.2
+ORDER BY price DESC;
