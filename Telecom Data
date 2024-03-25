@@ -1,0 +1,24 @@
+-- In this project, I've queried a telecommunications company database to get information about the company's products and customers. 
+-- Link to database: https://www.db-fiddle.com/f/4uyJzcvSbAUvHdbX17JaNt/24
+
+#1.  Write SQL that will select the product names of all the Internet products types.
+
+SELECT product_name
+FROM products
+WHERE product_type="Internet";
+
+#2. Write a query that will select the customer IDs for all the customers who are subscribed to High-Speed Internet.
+
+SELECT customer_id
+FROM customer_subscriptions c
+JOIN products p
+	ON c.product_id=p.product_id
+WHERE product_name = 'High-Speed Internet';
+
+#3. Write a query that will select the email addresses of all the customers who are subscribed to products with the "Internet" product type. 
+
+SELECT email
+FROM customer_subscriptions c
+JOIN products p
+	ON c.product_id=p.product_id
+WHERE product_type = 'Internet'
