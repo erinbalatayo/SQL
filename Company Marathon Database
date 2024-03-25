@@ -1,0 +1,26 @@
+-- In this project, I queried from a database containing fictional group of coworkers who ran in a marathon sponsored by a fictional company. 
+-- https://www.db-fiddle.com/f/3MJttDcYhwMYWStSs6h722/0
+
+#1. Select every participant name and the percent of the marathon that they completed.
+
+SELECT participant_name,
+	completion_fraction*100 percent_complete
+FROM marathon;
+
+#2. Select every participant name and the percent of the marathon that they completed. Show the percent of the marathon completed rounded to one decimal place.
+
+SELECT participant_name,
+	ROUND(completion_fraction*100,1) percent_complete
+FROM marathon;
+
+#For this query, show how many employees completed each quarter of the marathon (75% or more, 50%, 25%, or under 25%).
+
+SELECT COUNT(*) as num_employees,
+	CASE 
+    WHEN ROUND(completion_fraction*100,1) >=75 THEN '75% or more'
+    WHEN ROUND(completion_fraction*100,1) >=50 THEN '50% or more'
+    WHEN ROUND(completion_fraction*100,1) >=25 THEN '25% or more'
+    ELSE 'Under 25%'
+    END as quarter_completed
+FROM marathon
+GROUP BY quarter_completed;
