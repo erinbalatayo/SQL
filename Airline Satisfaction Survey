@@ -1,0 +1,118 @@
+-- The database used for this project is on Airline Passenger Satisfaction and may be found on Maven Analytics 
+-- Airline Passenger Satisfaction
+-- Customer satisfaction scores from 120,000+ airline passengers, including additional information about each passenger, their flight, and type of travel, as well as ther evaluation of different factors like cleanliness, comfort, service, and overall experience.
+
+
+-- To start off this project, I will query all columns and limit a return of 20 rows. This is to explore the dataset and understand what values lies within it.
+SELECT *
+FROM airline_passenger_satisfaction
+LIMIT 20;
+
+-- Next, out of curiousity, I want to check how many rows of data exist in this database. (129,487)
+SELECT COUNT(*)
+FROM airline_passenger_satisfaction;
+
+-- Now to begin EDA (exploratory data analysis). Looking at a variety of things.. Female to male ratio, sastifacation rate, first time vs returning...alter
+
+SELECT gender, 
+	COUNT(*)
+FROM airline_passenger_satisfaction
+GROUP BY gender;
+
+-- How many of these males and females are satisfied?
+SELECT gender, 
+	satisfaction,
+	COUNT(*) quantity
+FROM airline_passenger_satisfaction
+GROUP BY gender, satisfaction 
+ORDER BY quantity DESC;
+
+-- What percentage of customers are satisfied with their trip?
+SELECT ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction;
+
+-- STAKEHOLDER QUESTIONS
+#1. Which percentage of airline passengers are satisfied? Does it vary by customer type? What about type of travel?
+
+SELECT ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction; -- 43.4% is satisfied
+
+-- by customer gender: male vs female? 
+SELECT gender,
+	ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction
+GROUP BY gender; -- males are slighly more satisfied with their flight than females
+
+
+-- Customer type?
+SELECT `Customer Type`,
+	ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction
+GROUP BY `Customer Type`; -- returning customers are more satisfied than first-time customers.
+
+
+SELECT gender,
+	ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction
+GROUP BY gender; -- males are slighly more satisfied with their flight than females
+
+-- What about age?
+SELECT 
+	CASE 
+    WHEN age <20 THEN '0-20'
+    WHEN age BETWEEN 20 AND 40 THEN '20-40'
+    WHEN age BETWEEN 40 AND 60 then '40-60'
+    ELSE '61+'
+    END AS age_range,
+	ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction
+GROUP BY age_range
+ORDER BY age_range; -- those between the ages 20-60 are more likely to be satisfied with their flight compared to those younger than 20 and older than 61. 
+
+-- What about type of travel?
+SELECT `Type of Travel`,
+	ROUND(COUNT(CASE WHEN satisfaction = 'satisfied' THEN 1 END)/COUNT(*) * 100,1) AS satifaction_percent
+FROM airline_passenger_satisfaction
+GROUP BY `Type of Travel`; -- people who flew business are more satisfied than those who flew on a personal flight 
+
+# 2. What is the customer profile for a repeating airline passenger?
+SELECT gender,
+	CASE 
+    WHEN age <21 THEN '20 and younger'
+    WHEN age BETWEEN 20 AND 40 THEN '20-40'
+    WHEN age BETWEEN 40 AND 60 then '40-60'
+    ELSE '61+'
+    END AS age_range,
+    COUNT(*) as quantity
+FROM airline_passenger_satisfaction
+WHERE `Customer Type` = 'Returning'
+GROUP BY gender, age_range;
+
+-- What is the ratio between female and male returning passengers?
+SELECT ROUND(COUNT(CASE WHEN gender = 'female' THEN 1 END)/COUNT(*) * 100,1) AS percent_female,
+	ROUND(COUNT(CASE WHEN gender = 'MALE' THEN 1 END)/COUNT(*) * 100,1) AS percent_male
+FROM airline_passenger_satisfaction
+WHERE `Customer Type` = 'Returning';
+
+#3. Does flight distance affect customer preferences or flight patterns?
+SELECT 
+	`Type of Travel`,
+	CASE
+    WHEN `Flight Distance` < 3000 THEN 'Short Flight'
+    ELSE 'Long Flight'
+    END AS flight_type,
+    COUNT(*)
+FROM airline_passenger_satisfaction
+GROUP BY `Type of Travel`, flight_type
+;
+
+SELECT 
+	class,
+	CASE
+    WHEN `Flight Distance` < 3000 THEN 'Short Flight'
+    ELSE 'Long Flight'
+    END AS flight_type,
+    COUNT(*)
+FROM airline_passenger_satisfaction
+GROUP BY class, flight_type
+;
