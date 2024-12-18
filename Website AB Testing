@@ -1,0 +1,125 @@
+# Nova Retail, a United Kingdom-based e-commerce company, is conducting a website redesign to enhance conversion rates and user engagement. The experiment focuses on testing the impact of changing the website’s background color from white (Group A) to black (Group B) on key metrics: conversion rate, pages viewed per session, and bounce rate. Each group in the test included a sample size of 2,481 users.
+
+# The theory behind the test is rooted in user experience design, as darker backgrounds are often associated with a modern, sleek aesthetic that may reduce visual strain and help users focus on content. The analysis was carried out in collaboration with the web development and marketing teams using SQL, Python, and Tableau to derive actionable insights from the data.
+
+# Overview of data set
+SELECT *
+FROM ab_testing;
+
+# Checking total users in each group
+SELECT DISTINCT `group`, 
+	COUNT(*) 
+FROM ab_testing
+GROUP BY `group`; -- group A has more than group B
+
+# Checking to see if there are duplicate users
+SELECT `user id`
+FROM ab_testing
+GROUP BY `user id`
+HAVING count(`user id`) >1; -- no duplicates.
+
+# The sample size of both groups are not even. 
+# Down-sample via Python --> new dataset balanced_ab_testing_data
+# After down-sampling group A with python, the below query will confirm whether the sample sizes are equal
+SELECT DISTINCT `group`, 
+	COUNT(*) 
+FROM balanced_ab_testing_data
+GROUP BY `group`;
+
+-- EDA BELOW
+
+# CONVERSION RATES
+# Conversion rate by groups
+SELECT `group`, 
+	ROUND((SUM(IF(conversion = 'Yes', 1, 0))/COUNT(*)) * 100,2) AS conversion_rate
+FROM balanced_ab_testing_data
+GROUP BY `group`; -- Group B has a higher converstion rate at 14%, whereas group A only has 5%
+
+# Further segmentation between groups and devices
+SELECT `group`, 
+	device,
+	ROUND((SUM(IF(conversion = 'Yes', 1, 0))/COUNT(*)) * 100,2) AS conversion_rate
+FROM balanced_ab_testing_data
+GROUP BY `group`, device
+ORDER BY conversion_rate DESC; -- For group B, there is a slightly higher conversion rate in mobile users than desktop / Group A has slighter higher conversion rate among desktop users compared to mobile
+
+# Conversion rate segmented by location
+SELECT `group`,
+	location,
+	ROUND((SUM(IF(conversion = 'Yes', 1, 0))/COUNT(*)) * 100,2) AS conversion_rate
+FROM balanced_ab_testing_data
+GROUP BY `group`, location
+ORDER BY conversion_rate DESC; -- conversion rates are higher in Group B than group A by 6.6-10.3%
+
+# AVERAGE TIME SPENT PER SESSION
+# Avg time spent by group 
+SELECT `group`,
+	ROUND(AVG(`time spent`)/60,1) AS avg_time_spent
+FROM balanced_ab_testing_data
+GROUP BY `group`; -- Both groups spend 4 mins on average during their sessions.
+
+# Futher segmentation of avg time spent by group + device
+SELECT `group`,
+	device,
+	ROUND(AVG(`time spent`)/60,1) AS avg_time_spent
+FROM balanced_ab_testing_data
+GROUP BY `group`, device; -- Both groups spent 4 mins on average during their session amongst both devices, mobile and desktop
+
+# Additional segmentation of avg time by group + location
+SELECT `group`,
+	location,
+	ROUND(AVG(`time spent`)/60,1) AS avg_time_spent
+FROM balanced_ab_testing_data
+GROUP BY `group`, location
+ORDER BY location, avg_time_spent DESC; -- Group B spents slightly more time on average in England and North Ireland on average / Group A spent slightly more time time in Scotland and Wales. 
+	-- may want to test significance in Python
+    
+# NUMBER OF PAGES VIEWED PER SESSION
+# AVG pages viewed by groups
+SELECT `group`,
+	ROUND(AVG(`page views`),0) avg_page_viewed
+FROM balanced_ab_testing_data
+GROUP BY `group`
+ORDER BY `group`; -- group A views one more page on average than group B
+
+# AVG pages viewed by group + devices
+SELECT `group`,
+	device,
+	ROUND(AVG(`page views`),0) avg_page_viewed
+FROM balanced_ab_testing_data
+GROUP BY `group`, device; -- Group B views one more page on avg through desktop than mobile / group A views 8 pages on avg on both devices.
+
+# AVG pages viewed by group + location
+SELECT `group`,
+	location,
+	ROUND(AVG(`page views`),0) avg_page_viewed
+FROM balanced_ab_testing_data
+GROUP BY `group`, location
+ORDER BY location, avg_page_viewed DESC; -- Both groups view the same amount of pages on average in England (8), Scotland (8), and Wales (7). In Northern Ireland, Group A views 1 extra page on avg (8) than group B (7)
+
+# BOUNCE BACK RATES
+# Definition: if a user only looks at 1 page during their sesions
+SELECT `group`,
+		ROUND((SUM(CASE WHEN `page views` = 1 THEN 1 ELSE 0 END)/COUNT(*) * 100),2) AS bounce_back_rate
+FROM balanced_ab_testing_data
+GROUP BY `group`
+ORDER BY bounce_back_rate DESC; -- Bounce back rate is 0.80% higher in group A than group b.
+
+
+# Bounce back rates across groups, segmented by devices
+SELECT `group`,
+		device,
+		ROUND((SUM(CASE WHEN `page views` = 1 THEN 1 ELSE 0 END)/COUNT(*) * 100),2) AS bounce_back_rate
+FROM balanced_ab_testing_data
+GROUP BY `group`, device
+ORDER BY device, bounce_back_rate DESC; -- the bounce back rate is higer in desktop group b users than mobile group b users by 0.63%
+						-- bounce back rate in group a is slightly higher in mobile devices than  desktops by 0.77%
+                        -- overall, group a has higher bounce back rates on both devices when compared to group b
+                        
+# Bounce back rates across groups, segmented by location
+SELECT `group`,
+		location,
+		ROUND((SUM(CASE WHEN `page views` = 1 THEN 1 ELSE 0 END)/COUNT(*) * 100),2) AS bounce_back_rate
+FROM balanced_ab_testing_data
+GROUP BY `group`, location
+ORDER BY location, bounce_back_rate DESC; -- group A has higher bounce back rates in all regions except for Northern Ireland
