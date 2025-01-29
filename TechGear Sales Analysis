@@ -1,0 +1,322 @@
+SELECT * FROM superstore;
+
+# DATA CLEANING
+-- Exploring dataset
+SELECT COUNT(*)
+FROM superstore; #9994 records
+
+-- Checking the earliest and latest order dates
+SELECT MIN(`Order Date`),
+	MAX(`Order Date`)
+FROM superstore; -- noticed data type error. currently a text
+
+-- Changing format of dates from MM/DD/YYYY to YYYY-DD-MM
+UPDATE superstore
+SET `order date` = STR_TO_DATE(`order date`, '%m/%d/%Y'),
+	`ship date` = STR_TO_DATE(`ship date`, '%m/%d/%Y');
+    
+-- Updating order date and ship date's data type to DATE
+ALTER TABLE superstore
+MODIFY COLUMN `order date` DATE,
+MODIFY COLUMN `ship date` DATE;
+
+-- Updating sales, quantity, discount, and profit date types
+-- Changing text to int
+ALTER TABLE superstore
+MODIFY COLUMN sales DOUBLE,
+MODIFY COLUMN quantity INT,
+MODIFY COLUMN discount DOUBLE,
+MODIFY COLUMN profit DOUBLE;
+
+#EDA
+-- Segment types
+SELECT DISTINCT segment
+FROM superstore;
+
+-- Number of customers
+SELECT COUNT(DISTINCT `customer id`)
+FROM superstore; -- 793 customers
+
+-- Types of sub-categories
+SELECT DISTINCT `sub-category`
+FROM superstore
+ORDER BY `sub-category`; 
+
+SELECT *
+FROM superstore;
+
+-- Total transactions per year
+SELECT YEAR(`order date`) as year,
+	COUNT(DISTINCT `order id`) as total_orders
+FROM superstore
+GROUP BY year
+ORDER BY year; 
+
+-- Total sales per year
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue
+FROM superstore
+GROUP BY year
+ORDER BY year; -- slight decrease in revenue in 2015, followed by gradual increase in revenue 2016 and 2017.
+
+-- Total sales per month in 2017
+SELECT 
+	YEAR(`order date`) as year, 
+    MONTH(`order date`) as month,
+    ROUND(SUM(sales),2) as revenue
+FROM superstore
+WHERE `order date` BETWEEN '2017-01-01' AND '2017-12-31'
+GROUP BY year, month
+ORDER BY year; -- Revenue begins to increase in Fall (Sept-Nov) with Nov beinging the highest revenue; possibly due to Christmas shopping/Black Friday deals. 
+
+-- Looking at seasonal trend among ALL years for comparison
+SELECT 
+	YEAR(`order date`) as year, 
+    MONTH(`order date`) as month,
+    ROUND(SUM(sales),2) as revenue
+FROM superstore
+GROUP BY year, month
+ORDER BY year; -- For the most part each year experiences peak revenue in Fall with 2014 being an exception. May be easier to visualize on line graph.
+
+-- Total sales per year across states.
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    state
+FROM superstore
+GROUP BY year, state
+ORDER BY year, revenue DESC; -- 2014-2016: CA, NY, TX bring in the most revenue, 2017: CA, NY, WA bring in the most revenue (TX was bumped down to 4th)
+							-- The bottom 3 performing states varied each year. 
+							
+-- Total sales per year across different segments
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    segment
+FROM superstore
+GROUP BY year, segment
+ORDER BY year, revenue DESC; -- each year, consumers bring in the most revenue for the company, followed by corporate then home office. 
+
+-- Total sales per year across categories.
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    category
+FROM superstore
+GROUP BY year, category
+ORDER BY year, revenue DESC; -- trend: technology and furniture typically bring in the most revenue each year, with office supplies brigning the least. 
+							-- 2017 was the first year where office supplies brought in more revenue than furniture. 
+
+-- Revenue per year across prodcuts.
+-- 2014 TOP 10 PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2014
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue DESC
+LIMIT 3; -- 'Cisco TelePresence System EX90 Videoconferencing Unit', 'Lexmark MX611dhe Monochrome Laser Printer', 'HP Designjet T520 Inkjet Large Format Printer - 24" Color' brought 	in the most, which 	makes sense since they are all technology
+
+-- 2014 BOTTOM PERFORMING
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2014
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue ASC
+LIMIT 3; -- Office supplies are low performers which makes sense since the cost is significantly lower. 
+
+-- 2015 TOP PERFORMING PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2015
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue DESC
+LIMIT 3; -- Consumer preferences changed in 2015. No repeating top items in 2015 when compared to 2014
+
+-- 2015 BOTTOM PERFORMING PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2015
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue ASC
+LIMIT 3; -- Office supplies are still the lowest performer, but the items changed when compare to 2014
+
+
+-- 2016 TOP PERFORMING PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2016
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue DESC
+LIMIT 3; -- Consumer preferences changed in 2016. No repeating top items from 2014 or 2015
+
+-- 2016 BOTTOM PERFORMING PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2016
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue ASC
+LIMIT 3; -- Office supplies are still the lowest performer, but the items changed when compare to 2014 and 2015
+
+
+-- 2017 TOP PERFORMING PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2017
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue DESC
+LIMIT 3; -- Consumers still prefered Canon imageClass Copier in 2017 (repeat from 2016). The other 2 products differed this year.
+
+-- 2017 BOTTOM PERFORMING PRODUCTS
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales),2) as revenue,
+    `product name`, category
+FROM superstore
+WHERE YEAR(`order date`) = 2015
+GROUP BY year, `product name`, category 
+ORDER BY year, revenue ASC
+LIMIT 3; -- Office supplies are still the lowest performer, but the items changed when compare to prior years.
+
+# GROWTH RATES
+-- Calculating MOM sales growth 
+WITH MonthlySales AS (
+	SELECT
+		YEAR(`order date`) AS year,
+		MONTH(`order date`) AS month,
+        ROUND(SUM(sales),2) as TotalSales
+	FROM superstore
+    GROUP BY year, month
+)
+
+SELECT 
+    Year,
+    Month,
+    TotalSales,
+    LAG(TotalSales) OVER (ORDER BY Year, Month) AS PreviousMonthSales,
+    -- Calculate the growth rate using the formula
+    ROUND((TotalSales - LAG(TotalSales) OVER (ORDER BY Year, Month)) / LAG(TotalSales) OVER (ORDER BY Year, Month) * 100,2) AS SalesGrowthRate
+FROM MonthlySales
+ORDER BY Year, Month; -- MOM sales growth rates is unsteady
+
+-- YOY Sales Growth Rates
+WITH YearlySales AS (
+	SELECT
+		YEAR(`order date`) AS year,
+        ROUND(SUM(sales),2) as TotalSales
+	FROM superstore
+    GROUP BY year
+)
+
+SELECT 
+    Year,
+    TotalSales,
+    LAG(TotalSales) OVER (ORDER BY Year) AS PreviousYearSales,
+    -- Calculate the growth rate using the formula
+    ROUND((TotalSales - LAG(TotalSales) OVER (ORDER BY Year)) / LAG(TotalSales) OVER (ORDER BY Year) * 100,2) AS SalesGrowthRate
+FROM YearlySales
+ORDER BY Year; -- YOY sales growth had a 2.8% decrease after 2014 but had a steep increase in 2016 which continued to 2017. 
+
+
+-- YOY Sales Growth segmented by state 
+WITH YearlySalesState AS (
+	SELECT
+		YEAR(`order date`) AS year,
+        state,
+        ROUND(SUM(sales),2) as TotalSales
+	FROM superstore
+    GROUP BY year, state
+)
+
+SELECT 
+    Year,
+    State,
+    TotalSales,
+    LAG(TotalSales) OVER (PARTITION BY state ORDER BY year) AS PreviousYearSales,
+    -- Calculate the growth rate using the formula
+    ROUND((TotalSales - LAG(TotalSales) OVER (PARTITION BY state ORDER BY Year)) / LAG(TotalSales) OVER (PARTITION BY state ORDER BY Year) * 100,2) AS SalesGrowthRate
+FROM YearlySalesState
+ORDER BY Year, state;
+
+-- YOY Sales Growth segmented by category
+WITH YearlyCategoryGrowth AS (
+	SELECT
+		YEAR(`order date`) AS year,
+        category,
+        ROUND(SUM(sales),2) as TotalSales
+	FROM superstore
+    GROUP BY year, category
+)
+
+SELECT 
+    Year,
+    category,
+    TotalSales,
+    LAG(TotalSales) OVER (PARTITION BY category ORDER BY year) AS PreviousYearSales,
+    -- Calculate the growth rate using the formula
+    ROUND((TotalSales - LAG(TotalSales) OVER (PARTITION BY category ORDER BY Year)) / LAG(TotalSales) OVER (PARTITION BY category ORDER BY Year) * 100,2) AS SalesGrowthRate
+FROM YearlyCategoryGrowth
+ORDER BY Year, category;
+
+
+
+select *
+from superstore;
+
+# AOV
+SELECT YEAR(`order date`) as year,
+	ROUND(SUM(sales)/COUNT(DISTINCT `order id`),2) AS average_order_value
+FROM superstore
+GROUP BY year;
+
+-- PERCENT OF TOTAL SALES
+-- 2014: TECH, FURNITURE, OFFICE SUPPLIES
+SELECT category,
+    SUM(sales) AS TotalRevenue,
+    ROUND((SUM(sales) * 100.0 / SUM(SUM(sales)) OVER()), 2) AS PercentOfTotalSales
+FROM superstore
+WHERE year(`order date`) = 2014
+GROUP BY category
+ORDER BY TotalRevenue DESC;
+
+-- 2015 FURNITURE, TECH, OFFICE SUPPLIES
+SELECT category,
+    SUM(sales) AS TotalRevenue,
+    ROUND((SUM(sales) * 100.0 / SUM(SUM(sales)) OVER()), 2) AS PercentOfTotalSales
+FROM superstore
+WHERE year(`order date`) = 2015
+GROUP BY category
+ORDER BY TotalRevenue DESC;
+
+-- 2016: TECH, FURNITURE, OFFICE SUPPLIES
+SELECT category,
+    SUM(sales) AS TotalRevenue,
+    ROUND((SUM(sales) * 100.0 / SUM(SUM(sales)) OVER()), 2) AS PercentOfTotalSales
+FROM superstore
+WHERE year(`order date`) = 2016
+GROUP BY category
+ORDER BY TotalRevenue DESC;
+
+-- 2017: TECH, FURNITURE, OFFICE SUPPLIES
+SELECT category,
+    SUM(sales) AS TotalRevenue,
+    ROUND((SUM(sales) * 100.0 / SUM(SUM(sales)) OVER()), 2) AS PercentOfTotalSales
+FROM superstore
+WHERE year(`order date`) = 2017
+GROUP BY category
+ORDER BY TotalRevenue DESC;
+
+-- PRODUCTS BY PERCENTAGE
+SELECT SUM(sales)
+fROM SUPERSTORE
+where YEAR(`order date`) = 2017 AND state = 'Wyoming';
+
